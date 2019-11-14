@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "Player_Base.generated.h"
 
+
+
 UCLASS(Blueprintable)
 class VRTEST_API APlayer_Base : public APawn
 {
@@ -15,19 +17,23 @@ private:
 
 	//private functions
 
-	bool LowerOxygen();
+	bool bLowerOxygen();
 
 	void InitializeComponents();
 
 	void InitializeVariables();
+
+	void SetStressStage();
 	//
 
 	//private variables
 	float deltaTime;
 
-	bool canLeftStroke;
+	bool bCanLeftStroke;
 
-	bool canRightStroke;
+	bool bCanRightStroke;
+
+	int currentStressStage;
 
 	//
 
@@ -41,7 +47,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
+public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -51,7 +57,7 @@ public:
 
 	//Functions Section
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION( BlueprintCallable)
 	void ForwardStroke(float force);
 
 	UFUNCTION(BlueprintCallable)
@@ -95,7 +101,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void EndVrRightCounter();
-
+	
 	//
 
 	// Components Section
@@ -108,10 +114,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UCameraComponent* camera;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UFloatingPawnMovement* movementComponent;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UAudioComponent* swimAudioComponent;
 
@@ -121,7 +127,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UAudioComponent* healAudioComponent;
 
-
+	
 	//
 
 
@@ -130,42 +136,57 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsBraking;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement Speed")
 	float forceScaler;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Oxygen System")
 	float oxygen;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Oxygen System")
 	float maxOxygen;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Oxygen System")
 	float stressLevel;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float minimumStressLevel;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Oxygen System")
+	float minimumStressLevel = 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float maximumStressLevel;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Oxygen System")
+	float maximumStressLevel = 100;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Oxygen System")
 	float timeBeforeStressRecovery;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bPlayerIsDead;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float forwardLeftCounter;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float forwardRightCounter;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Oxygen System")
 	float oxygenPercentage;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Oxygen System")
 	float stressPercentage;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsPhysicsActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsStuckInNet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement Speed")
+	float maxSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement Speed")
+	float acceleration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement Speed")
+	float deacceleration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement Speed")
+	float brakingDeacceleration;
 };

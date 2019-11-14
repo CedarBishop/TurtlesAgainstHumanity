@@ -15,13 +15,13 @@
 // Sets default values
 APlayer_Base::APlayer_Base()
 {
-	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	InitializeComponents();
 
 	InitializeVariables();
-
+	
 }
 
 
@@ -30,13 +30,22 @@ void APlayer_Base::BeginPlay()
 {
 	Super::BeginPlay();
 	oxygen = maxOxygen;
-
+	
 	bPlayerIsDead = false;
 
 	stressPercentage = stressLevel / maximumStressLevel;
 	oxygenPercentage = oxygen / maxOxygen;
 
 	sphereCollision->SetSimulatePhysics(bIsPhysicsActor);
+
+	if (movementComponent == nullptr)
+	{
+		 movementComponent = Cast<UFloatingPawnMovement>(GetMovementComponent());
+	}
+
+	movementComponent->Acceleration = acceleration;
+	movementComponent->MaxSpeed = maxSpeed;
+	movementComponent->Deceleration = deacceleration;
 
 
 }
@@ -49,7 +58,7 @@ void APlayer_Base::Tick(float DeltaTime)
 
 	if (bPlayerIsDead == false)
 	{
-		bPlayerIsDead = LowerOxygen();
+		bPlayerIsDead = bLowerOxygen();
 	}
 }
 
@@ -61,13 +70,18 @@ void APlayer_Base::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void APlayer_Base::ForwardStroke(float force)
 {
+	if (bIsStuckInNet)
+	{
+		return;
+	}
 	FRotator rotation = Controller->GetControlRotation();
 	const FVector direction = FRotationMatrix(rotation).GetScaledAxis(EAxis::X);
-	AddMovementInput(direction, force);
+	AddMovementInput(direction,force);	
 	if (swimAudioComponent->Sound == NULL)
 	{
 		return;
 	}
+
 	swimAudioComponent->Play();
 }
 
@@ -78,6 +92,7 @@ void APlayer_Base::RaiseMinimumStressLevel(float addedStress)
 	{
 		stressLevel = minimumStressLevel;
 	}
+	SetStressStage();
 	stressPercentage = stressLevel / maximumStressLevel;
 }
 
@@ -85,11 +100,13 @@ void APlayer_Base::OxygenResupply(float stressHealed, float oxygenReplenished)
 {
 	oxygen += oxygenReplenished;
 	oxygenPercentage = oxygen / maxOxygen;
+	stressLevel -= stressHealed;
+	SetStressStage();
 	if (oxygen > maxOxygen)
 	{
 		oxygen = maxOxygen;
 	}
-	if (healAudioComponent->Sound == NULL)
+	if (healAudioComponent->Sound == NULL )
 	{
 		return;
 	}
@@ -101,20 +118,71 @@ void APlayer_Base::OxygenResupply(float stressHealed, float oxygenReplenished)
 void APlayer_Base::ObstacleHit(float stressDamage, float oxygenDamage)
 {
 	stressLevel += stressDamage;
+	SetStressStage();
 	stressPercentage = stressLevel / maximumStressLevel;
 	oxygen -= (oxygen / 100) * oxygenDamage;
 	oxygenPercentage = oxygen / maxOxygen;
 	timeBeforeStressRecovery = 5;
-	if (hurtAudioComponent->Sound == NULL)
+	if (hurtAudioComponent->Sound == NULL )
 	{
 		return;
 	}
 	hurtAudioComponent->Play();
+
+	
 }
 
-bool APlayer_Base::LowerOxygen()
+void APlayer_Base::SetStressStage()
 {
-	oxygen -= stressLevel * deltaTime;
+	if (stressLevel > 90 && stressLevel <= 100)
+	{
+		currentStressStage = 5;
+	}
+	else if (stressLevel > 75 && stressLevel <= 90)
+	{
+		currentStressStage = 4;
+	}
+	else if (stressLevel > 60 && stressLevel <= 75)
+	{
+		currentStressStage = 3;
+	}
+	else if (stressLevel > 35 && stressLevel <= 60)
+	{
+		currentStressStage = 2;
+	}
+	else if (stressLevel > 0 && stressLevel <= 35)
+	{
+		currentStressStage = 1;
+	}
+}
+
+bool APlayer_Base::bLowerOxygen()
+{
+	switch (currentStressStage)
+	{
+	case 1:
+		oxygen -= 2 * deltaTime;
+		break;
+
+	case 2:
+		oxygen -= 5 * deltaTime;
+		break;
+
+	case 3:
+		oxygen -= 10 * deltaTime;
+		break;
+
+	case 4:
+		oxygen -= 15 * deltaTime;
+		break;
+
+	case 5:
+		oxygen -= 20 * deltaTime;
+		break;
+	default:
+		break;
+	}
+
 	oxygenPercentage = oxygen / maxOxygen;
 	if (oxygen <= 0)
 	{
@@ -145,7 +213,7 @@ void APlayer_Base::Brake()
 		movementComponent = Cast<UFloatingPawnMovement>(GetMovementComponent());
 	}
 	bIsBraking = true;
-	movementComponent->Deceleration = 500.0f;
+	movementComponent->Deceleration = brakingDeacceleration;
 }
 
 void APlayer_Base::UnBrake()
@@ -155,7 +223,7 @@ void APlayer_Base::UnBrake()
 		movementComponent = Cast<UFloatingPawnMovement>(GetMovementComponent());
 	}
 	bIsBraking = false;
-	movementComponent->Deceleration = 100.0f;
+	movementComponent->Deceleration = deacceleration;
 }
 
 void APlayer_Base::InitializeComponents()
@@ -170,12 +238,12 @@ void APlayer_Base::InitializeComponents()
 
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	camera->SetupAttachment(sceneComponent);
-	camera->SetRelativeLocation(FVector(10.0f, 0.0f, 0.0f));
+	camera->SetRelativeLocation(FVector(10.0f,0.0f,0.0f));
 
 	movementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movement Component"));
-	movementComponent->Acceleration = 25000;
-	movementComponent->MaxSpeed = 1200;
-	movementComponent->Deceleration = 1;
+	movementComponent->Acceleration = acceleration;
+	movementComponent->MaxSpeed = maxSpeed;
+	movementComponent->Deceleration = deacceleration;
 	movementComponent->TurningBoost = 8;
 
 	swimAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Swim Audio Component"));
@@ -200,6 +268,16 @@ void APlayer_Base::InitializeVariables()
 	maxOxygen = 1000;
 	forceScaler = 3;
 	timeBeforeStressRecovery = 5;
+	maxSpeed = 1000.0f;
+	acceleration = 25000.0f;
+	deacceleration = 100.0f;
+	brakingDeacceleration = 500.0f;
+
+	movementComponent->Acceleration = acceleration;
+	movementComponent->MaxSpeed = maxSpeed;
+	movementComponent->Deceleration = deacceleration;
+	movementComponent->TurningBoost = 8;
+
 }
 
 void APlayer_Base::StartPcLeftCounter()
@@ -242,36 +320,34 @@ void APlayer_Base::EndPcRightCounter()
 void APlayer_Base::StartVrLeftCounter()
 {
 	forwardLeftCounter = UGameplayStatics::GetTimeSeconds(this);
-	canLeftStroke = true;
+	bCanLeftStroke = true;
 }
 
 void APlayer_Base::StartVrRightCounter()
 {
 	forwardRightCounter = UGameplayStatics::GetTimeSeconds(this);
-	canRightStroke = true;
+	bCanRightStroke = true;
 }
 
 void APlayer_Base::EndVrLeftCounter()
 {
-	if (canLeftStroke)
+	if (bCanLeftStroke)
 	{
 		float time = UGameplayStatics::GetTimeSeconds(this) - forwardLeftCounter;
-		canLeftStroke = false;
+		bCanLeftStroke = false;
 		if (time < 1.5f)
 		{
 			ForwardStroke(forceScaler * (1.5f - time));
 		}
 	}
-
-
 }
 
 void APlayer_Base::EndVrRightCounter()
 {
-	if (canRightStroke)
+	if (bCanRightStroke)
 	{
 		float time = UGameplayStatics::GetTimeSeconds(this) - forwardLeftCounter;
-		canRightStroke = false;
+		bCanRightStroke = false;
 		if (time < 1.5f)
 		{
 			ForwardStroke(forceScaler * (1.5f - time));
