@@ -101,6 +101,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void EndVrRightCounter();
+
+	UFUNCTION(BlueprintCalLable)
+	UCameraComponent* CameraGetter();
 	
 	//
 

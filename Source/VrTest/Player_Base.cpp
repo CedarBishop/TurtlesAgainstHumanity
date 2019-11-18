@@ -47,6 +47,7 @@ void APlayer_Base::BeginPlay()
 	movementComponent->MaxSpeed = maxSpeed;
 	movementComponent->Deceleration = deacceleration;
 
+	SetStressStage();
 
 }
 
@@ -354,3 +355,9 @@ void APlayer_Base::EndVrRightCounter()
 		}
 	}
 }
+
+UCameraComponent* APlayer_Base::CameraGetter()
+{
+	return camera;
+}
+
