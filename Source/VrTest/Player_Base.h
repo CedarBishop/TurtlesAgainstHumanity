@@ -33,7 +33,11 @@ private:
 
 	bool bCanRightStroke;
 
-	int currentStressStage;
+	bool bCanStroke;
+
+	float canStrokeTimer;
+
+	
 
 	//
 
@@ -102,8 +106,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EndVrRightCounter();
 
-	UFUNCTION(BlueprintCalLable)
+	UFUNCTION(BlueprintCallable)
 	UCameraComponent* CameraGetter();
+
+	UFUNCTION(BlueprintCallable)
+	void SetAudioComponentVolumes(float newVolume);
 	
 	//
 
@@ -160,13 +167,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Oxygen System")
 	float timeBeforeStressRecovery;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Read Only Vars")
 	bool bPlayerIsDead;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Read Only Vars")
 	float forwardLeftCounter;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Read Only Vars")
 	float forwardRightCounter;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Oxygen System")
@@ -178,7 +185,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsPhysicsActor;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Read Only Vars")
 	bool bIsStuckInNet;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement Speed")
@@ -192,4 +199,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement Speed")
 	float brakingDeacceleration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MovementSpeed")
+	float timeBtwStrokes;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Oxygen System", meta = (clampMin = "1", clampMax = "5"))
+	int currentStressStage;
 };
