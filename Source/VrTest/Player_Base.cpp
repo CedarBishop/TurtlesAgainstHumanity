@@ -49,6 +49,9 @@ void APlayer_Base::BeginPlay()
 
 	SetStressStage();
 
+	bCanStroke = true;
+	canStrokeTimer = timeBtwStrokes;
+
 }
 
 // Called every frame
@@ -61,6 +64,16 @@ void APlayer_Base::Tick(float DeltaTime)
 	{
 		bPlayerIsDead = bLowerOxygen();
 	}
+
+	if (canStrokeTimer > 0)
+	{
+		canStrokeTimer -= DeltaTime;
+		bCanStroke = false;
+	}
+	else
+	{
+		bCanStroke = true;
+	}
 }
 
 // Called to bind functionality to input
@@ -71,6 +84,10 @@ void APlayer_Base::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void APlayer_Base::ForwardStroke(float force)
 {
+	if (bCanStroke == false)
+	{
+		return;
+	}
 	if (bIsStuckInNet)
 	{
 		return;
@@ -78,6 +95,7 @@ void APlayer_Base::ForwardStroke(float force)
 	FRotator rotation = Controller->GetControlRotation();
 	const FVector direction = FRotationMatrix(rotation).GetScaledAxis(EAxis::X);
 	AddMovementInput(direction,force);	
+	canStrokeTimer = timeBtwStrokes;
 	if (swimAudioComponent->Sound == NULL)
 	{
 		return;
@@ -279,6 +297,8 @@ void APlayer_Base::InitializeVariables()
 	movementComponent->Deceleration = deacceleration;
 	movementComponent->TurningBoost = 8;
 
+	timeBtwStrokes = 0.5f;
+
 }
 
 void APlayer_Base::StartPcLeftCounter()
@@ -359,5 +379,23 @@ void APlayer_Base::EndVrRightCounter()
 UCameraComponent* APlayer_Base::CameraGetter()
 {
 	return camera;
+}
+
+void APlayer_Base::SetAudioComponentVolumes(float newVolume)
+{
+	if (newVolume > 1)
+	{
+		newVolume = 1;
+	}
+	else if (newVolume < 0)
+	{
+		newVolume = 0;
+	}
+	swimAudioComponent->VolumeModulationMin = newVolume;
+	swimAudioComponent->VolumeModulationMax = newVolume;
+	hurtAudioComponent->VolumeModulationMin = newVolume;
+	hurtAudioComponent->VolumeModulationMax = newVolume;
+	healAudioComponent->VolumeModulationMin = newVolume;
+	healAudioComponent->VolumeModulationMax = newVolume;
 }
 
