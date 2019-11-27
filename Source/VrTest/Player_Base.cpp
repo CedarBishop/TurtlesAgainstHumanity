@@ -19,7 +19,6 @@ APlayer_Base::APlayer_Base()
 	PrimaryActorTick.bCanEverTick = true;
 
 	InitializeComponents();
-
 	InitializeVariables();
 	
 }
@@ -60,6 +59,11 @@ void APlayer_Base::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	deltaTime = DeltaTime;
 
+	if (bIsInMainMenu)
+	{
+		oxygen = maxOxygen;
+	}
+
 	if (bPlayerIsDead == false)
 	{
 		bPlayerIsDead = bLowerOxygen();
@@ -73,6 +77,10 @@ void APlayer_Base::Tick(float DeltaTime)
 	else
 	{
 		bCanStroke = true;
+	}
+	if (bIsInTutorial)
+	{
+		TutorialMovement();
 	}
 }
 
@@ -89,6 +97,10 @@ void APlayer_Base::ForwardStroke(float force)
 		return;
 	}
 	if (bIsStuckInNet)
+	{
+		return;
+	}
+	if (bIsInTutorial)
 	{
 		return;
 	}
@@ -296,7 +308,7 @@ void APlayer_Base::InitializeVariables()
 	movementComponent->MaxSpeed = maxSpeed;
 	movementComponent->Deceleration = deacceleration;
 	movementComponent->TurningBoost = 8;
-
+	interpSpeed = 0.6f;
 	timeBtwStrokes = 0.5f;
 
 }
@@ -398,4 +410,34 @@ void APlayer_Base::SetAudioComponentVolumes(float newVolume)
 	healAudioComponent->VolumeModulationMin = newVolume;
 	healAudioComponent->VolumeModulationMax = newVolume;
 }
+
+void APlayer_Base::SetTutorialStatus(bool status)
+{
+	bIsInTutorial = status;
+	pathIndex = 0;
+	timeSinceTutorialBegan = 0;
+}
+
+void APlayer_Base::TutorialMovement()
+{
+	timeSinceTutorialBegan += deltaTime;
+	if (path.Num() > 0)
+	{
+		FVector newLocation = FVector(FMath::VInterpConstantTo(GetActorLocation(),path[pathIndex]->GetActorLocation(), timeSinceTutorialBegan, interpSpeed));
+		SetActorLocation(newLocation);
+		if (GetActorLocation() == path[pathIndex]->GetActorLocation())
+		{
+			if (pathIndex < path.Num() - 1 )
+			{
+				pathIndex++;
+			}
+			else
+			{
+				SetTutorialStatus(false);
+			}
+		}
+
+	}
+}
+
 

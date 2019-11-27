@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Engine/TargetPoint.h"
 #include "Player_Base.generated.h"
-
 
 
 UCLASS(Blueprintable)
@@ -24,6 +24,9 @@ private:
 	void InitializeVariables();
 
 	void SetStressStage();
+
+	void TutorialMovement();
+
 	//
 
 	//private variables
@@ -36,6 +39,10 @@ private:
 	bool bCanStroke;
 
 	float canStrokeTimer;
+
+	int pathIndex;
+
+	float timeSinceTutorialBegan;
 
 	
 
@@ -111,6 +118,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetAudioComponentVolumes(float newVolume);
+
+	UFUNCTION(BlueprintCallable)
+	void SetTutorialStatus(bool status);
 	
 	//
 
@@ -205,4 +215,16 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Oxygen System", meta = (clampMin = "1", clampMax = "5"))
 	int currentStressStage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsInMainMenu;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tutorial")
+	bool bIsInTutorial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	TArray<ATargetPoint*> path;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	float interpSpeed;
 };
