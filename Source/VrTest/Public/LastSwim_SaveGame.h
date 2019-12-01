@@ -17,6 +17,8 @@ class VRTEST_API ULastSwim_SaveGame : public USaveGame
 
 public:
 
+	ULastSwim_SaveGame();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Save Game ID Vars")
 	FString saveGameSlotName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Save Game ID Vars")

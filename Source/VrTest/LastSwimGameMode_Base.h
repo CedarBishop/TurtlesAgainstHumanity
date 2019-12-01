@@ -76,6 +76,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void ExecuteCallEvent();
 
+	UFUNCTION(BlueprintCallable)
+	FVector GetRandomLocationInRadius(float radius, FVector origin, float height);
+
+	UFUNCTION(BlueprintCallable)
+	void LoadSettings();
+
+	UFUNCTION(BlueprintCallable)
+	void SaveSettings();
 
 	// Blueprintable Components
 
@@ -121,5 +129,14 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString currentBreakingNewsText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Save Game Vars")
+	FString slotName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Save Game Vars")
+	int userIndex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ULastSwim_GameInstance* gameInstance;
 
 };

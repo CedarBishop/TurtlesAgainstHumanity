@@ -2,13 +2,17 @@
 
 
 #include "LastSwim_GameInstance.h"
+#include "LastSwimGameMode_Base.h"
+#include "Kismet/GameplayStatics.h"
+
 
 void ULastSwim_GameInstance::Init()
 {
 	Super::Init();
 
 	bFirstPlaythrough = true;
-	musicVolume = 1.0f;
-	sfxVolume = 1.0f;
-	LODLevel = 2;
+	if (ALastSwimGameMode_Base* gamemode = Cast<ALastSwimGameMode_Base>(  UGameplayStatics::GetGameMode(this)))
+	{
+		gamemode->LoadSettings();
+	}
 }

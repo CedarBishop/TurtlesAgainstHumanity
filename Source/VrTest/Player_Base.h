@@ -117,7 +117,10 @@ public:
 	UCameraComponent* CameraGetter();
 
 	UFUNCTION(BlueprintCallable)
-	void SetAudioComponentVolumes(float newVolume);
+	void SetSFXVolume(float newVolume);
+
+	UFUNCTION(BlueprintCallable)
+	void SetMusicVolume(float newVolume);
 
 	UFUNCTION(BlueprintCallable)
 	void SetTutorialStatus(bool status);
@@ -147,6 +150,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UAudioComponent* healAudioComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAudioComponent* backGroundMusicAudioComponent;
 	
 	//
 

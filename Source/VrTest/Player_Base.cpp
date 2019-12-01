@@ -288,6 +288,10 @@ void APlayer_Base::InitializeComponents()
 	healAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Heal Audio Component"));
 	healAudioComponent->SetupAttachment(camera);
 	healAudioComponent->SetRelativeLocation(FVector(100, 0, 0));
+
+	backGroundMusicAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Back Ground Music"));
+	backGroundMusicAudioComponent->SetupAttachment(camera);
+	backGroundMusicAudioComponent->SetRelativeLocation(FVector(100, 0, 0));
 }
 
 void APlayer_Base::InitializeVariables()
@@ -393,7 +397,7 @@ UCameraComponent* APlayer_Base::CameraGetter()
 	return camera;
 }
 
-void APlayer_Base::SetAudioComponentVolumes(float newVolume)
+void APlayer_Base::SetSFXVolume(float newVolume)
 {
 	if (newVolume > 1)
 	{
@@ -409,6 +413,20 @@ void APlayer_Base::SetAudioComponentVolumes(float newVolume)
 	hurtAudioComponent->VolumeModulationMax = newVolume;
 	healAudioComponent->VolumeModulationMin = newVolume;
 	healAudioComponent->VolumeModulationMax = newVolume;
+}
+
+void APlayer_Base::SetMusicVolume(float newVolume)
+{
+	if (newVolume > 1)
+	{
+		newVolume = 1;
+	}
+	else if (newVolume < 0)
+	{
+		newVolume = 0;
+	}
+	backGroundMusicAudioComponent->VolumeModulationMin = newVolume;
+	backGroundMusicAudioComponent->VolumeModulationMax = newVolume;
 }
 
 void APlayer_Base::SetTutorialStatus(bool status)
