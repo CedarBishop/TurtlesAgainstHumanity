@@ -5,7 +5,29 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Engine/TargetPoint.h"
+//#include "EngineMinimal.h"
 #include "Player_Base.generated.h"
+
+
+USTRUCT(BlueprintType)
+struct FTutorialPath
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ATargetPoint* path;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float interpSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bStopsAtTargetPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float stoppingTime;
+};
 
 
 UCLASS(Blueprintable)
@@ -44,7 +66,7 @@ private:
 
 	float timeSinceTutorialBegan;
 
-	
+	float tutorialStoppingTimer;
 
 	//
 
@@ -224,12 +246,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsInMainMenu;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	bool bSkipTutorial;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tutorial")
 	bool bIsInTutorial;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
-	TArray<ATargetPoint*> path;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
-	float interpSpeed;
+	TArray<FTutorialPath> tutorialPath;
 };
