@@ -10,6 +10,8 @@
 #include "GameFramework/PlayerController.h"
 #include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "EngineMinimal.h"
+#include "Engine/Engine.h"
 
 
 // Sets default values
@@ -312,7 +314,6 @@ void APlayer_Base::InitializeVariables()
 	movementComponent->MaxSpeed = maxSpeed;
 	movementComponent->Deceleration = deacceleration;
 	movementComponent->TurningBoost = 8;
-	interpSpeed = 0.6f;
 	timeBtwStrokes = 0.5f;
 
 }
@@ -431,30 +432,60 @@ void APlayer_Base::SetMusicVolume(float newVolume)
 
 void APlayer_Base::SetTutorialStatus(bool status)
 {
+	if (bSkipTutorial)
+	{
+		return;
+	}
 	bIsInTutorial = status;
 	pathIndex = 0;
 	timeSinceTutorialBegan = 0;
+	tutorialStoppingTimer = tutorialPath[pathIndex].stoppingTime;
 }
 
 void APlayer_Base::TutorialMovement()
 {
 	timeSinceTutorialBegan += deltaTime;
-	if (path.Num() > 0)
+	if (tutorialPath.Num() > 0)
 	{
-		FVector newLocation = FVector(FMath::VInterpConstantTo(GetActorLocation(),path[pathIndex]->GetActorLocation(), timeSinceTutorialBegan, interpSpeed));
+		
+
+		FVector newLocation = FVector(FMath::VInterpConstantTo(GetActorLocation(), tutorialPath[pathIndex].path->GetActorLocation(), timeSinceTutorialBegan, tutorialPath[pathIndex].interpSpeed));
 		SetActorLocation(newLocation);
-		if (GetActorLocation() == path[pathIndex]->GetActorLocation())
+		if (GetActorLocation() == tutorialPath[pathIndex].path->GetActorLocation())
 		{
-			if (pathIndex < path.Num() - 1 )
+			if (pathIndex < tutorialPath.Num() - 1 )
 			{
-				pathIndex++;
+				if (tutorialPath[pathIndex].bStopsAtTargetPoint)
+				{
+					if (tutorialStoppingTimer <= 0)
+					{
+						timeSinceTutorialBegan = (timeSinceTutorialBegan / 1.2f);
+						pathIndex++;
+						tutorialStoppingTimer = tutorialPath[pathIndex].stoppingTime;
+					
+					}
+					else
+					{
+						tutorialStoppingTimer -= deltaTime;
+					
+					}
+				}
+				else
+				{
+					timeSinceTutorialBegan = 0;
+					pathIndex++;
+					tutorialStoppingTimer = tutorialPath[pathIndex].stoppingTime;
+				/*	if (GEngine)
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Incremented path"));
+					}*/
+				}
 			}
 			else
 			{
 				SetTutorialStatus(false);
 			}
 		}
-
 	}
 }
 
