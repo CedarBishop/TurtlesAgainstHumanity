@@ -29,4 +29,6 @@ public:
 	float bgmVolume;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	int LODLevel;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+		bool bHasBeenSaved;
 };

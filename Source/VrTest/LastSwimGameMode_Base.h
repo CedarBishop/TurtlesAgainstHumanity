@@ -54,6 +54,9 @@ private:
 
 	float timer;
 
+	float delayTimer;
+	bool bHasLoadedSettings;
+
 
 public:
 	// Sets default values for this pawn's properties

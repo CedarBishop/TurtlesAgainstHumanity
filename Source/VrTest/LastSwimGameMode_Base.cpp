@@ -6,7 +6,8 @@
 #include "Player_Base.h"
 #include "LastSwim_SaveGame.h"
 #include "LastSwim_GameInstance.h"
-
+#include "EngineMinimal.h"
+#include "Engine/Engine.h"
 
 ALastSwimGameMode_Base::ALastSwimGameMode_Base()
 {
@@ -33,7 +34,14 @@ void ALastSwimGameMode_Base::BeginPlay()
 	{
 		player = Cast<APlayer_Base>(UGameplayStatics::GetPlayerPawn(this, 0));
 	}
+	if (gameInstance == NULL)
+	{
+		gameInstance = Cast<ULastSwim_GameInstance>(UGameplayStatics::GetGameInstance(this));
+		gameInstance->gamemode = this;
+	}
 	playerLastPosition = player->GetActorLocation();
+	delayTimer = 0.1f;
+
 
 }
 
@@ -49,6 +57,15 @@ void ALastSwimGameMode_Base::Tick(float DeltaSeconds)
 	else
 	{
 		timer -= DeltaSeconds;
+	}
+	if (delayTimer <= 0 && bHasLoadedSettings == false)
+	{
+		LoadSettings();
+		bHasLoadedSettings = true;
+	}
+	else
+	{
+		delayTimer -= DeltaSeconds;
 	}
 }
 
@@ -109,6 +126,11 @@ void ALastSwimGameMode_Base::SaveSettings()
 			SaveGameInstance->LODLevel = gameInstance->LODLevel;
 			SaveGameInstance->sfxVolume = gameInstance->sfxVolume;
 			SaveGameInstance->bgmVolume = gameInstance->musicVolume;
+			SaveGameInstance->bHasBeenSaved = true;
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Saved Values"));
+			}
 		}
 
 
@@ -116,7 +138,10 @@ void ALastSwimGameMode_Base::SaveSettings()
 		// Save the data immediately.
 		if (UGameplayStatics::SaveGameToSlot(SaveGameInstance, slotName, userIndex))
 		{
-			UGameplayStatics::SaveGameToSlot(SaveGameInstance, slotName, userIndex);
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Saved Game"));
+			}
 			// Save succeeded.
 		}
 	}
@@ -135,9 +160,30 @@ void ALastSwimGameMode_Base::LoadSettings()
 
 		if (gameInstance != NULL)
 		{
-			gameInstance->sfxVolume = LoadedGame->sfxVolume;
-			gameInstance->musicVolume = LoadedGame->bgmVolume;
-			gameInstance->LODLevel = LoadedGame->LODLevel;
+			if (LoadedGame->bHasBeenSaved == true)
+			{
+				gameInstance->sfxVolume = LoadedGame->sfxVolume;
+				gameInstance->musicVolume = LoadedGame->bgmVolume;
+				gameInstance->LODLevel = LoadedGame->LODLevel;
+
+				if (GEngine)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Loaded Saved Values"));
+				}
+			}
+			else
+			{
+				gameInstance->sfxVolume = 1.0f;
+				gameInstance->musicVolume = 1.0f;
+				gameInstance->LODLevel = 1;
+
+				if (GEngine)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Loaded Default Values"));
+				}
+			}
+			
+			
 		}
 
 		if (player == NULL)
@@ -152,6 +198,13 @@ void ALastSwimGameMode_Base::LoadSettings()
 			// set material quality as well here
 		}
 
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Loaded Game Failed"));
+		}
 	}
 }
 

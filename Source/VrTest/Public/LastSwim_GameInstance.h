@@ -31,4 +31,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int LODLevel;
+
+	class ALastSwimGameMode_Base* gamemode;
 };

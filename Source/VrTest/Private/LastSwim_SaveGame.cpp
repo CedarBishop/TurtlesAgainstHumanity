@@ -5,7 +5,7 @@
 
 ULastSwim_SaveGame::ULastSwim_SaveGame()
 {
-	saveGameSlotName = TEXT("SlotOne");
+	saveGameSlotName = "SlotOne";
 	userIndex = 0;
 
 	sfxVolume = 1.0f;
