@@ -102,7 +102,7 @@ void APlayer_Base::ForwardStroke(float force)
 	{
 		return;
 	}
-	if (bIsInTutorial)
+	if (bIsInTutorial && bTutorialImageIsActive == false)
 	{
 		return;
 	}
@@ -115,6 +115,12 @@ void APlayer_Base::ForwardStroke(float force)
 		return;
 	}
 
+	if (bTutorialImageIsActive)
+	{
+		bTutorialImageIsActive = false;
+		ExecuteTutorialImageSpawn();
+		SetTutorialStatus(false);
+	}
 	swimAudioComponent->Play();
 }
 
@@ -291,6 +297,10 @@ void APlayer_Base::InitializeComponents()
 	healAudioComponent->SetupAttachment(camera);
 	healAudioComponent->SetRelativeLocation(FVector(100, 0, 0));
 
+	ambientSFXAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Ambient SFX Audio Component"));
+	ambientSFXAudioComponent->SetupAttachment(camera);
+	ambientSFXAudioComponent->SetRelativeLocation(FVector(100, 0, 0));
+
 	backGroundMusicAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Back Ground Music"));
 	backGroundMusicAudioComponent->SetupAttachment(camera);
 	backGroundMusicAudioComponent->SetRelativeLocation(FVector(100, 0, 0));
@@ -393,6 +403,11 @@ void APlayer_Base::EndVrRightCounter()
 	}
 }
 
+void APlayer_Base::ExecuteTutorialImageSpawn_Implementation()
+{
+	// do something
+}
+
 UCameraComponent* APlayer_Base::CameraGetter()
 {
 	return camera;
@@ -414,6 +429,8 @@ void APlayer_Base::SetSFXVolume(float newVolume)
 	hurtAudioComponent->VolumeModulationMax = newVolume;
 	healAudioComponent->VolumeModulationMin = newVolume;
 	healAudioComponent->VolumeModulationMax = newVolume;
+	ambientSFXAudioComponent->VolumeModulationMin = newVolume;
+	ambientSFXAudioComponent->VolumeModulationMax = newVolume;
 }
 
 void APlayer_Base::SetMusicVolume(float newVolume)
@@ -447,8 +464,6 @@ void APlayer_Base::TutorialMovement()
 	timeSinceTutorialBegan += deltaTime;
 	if (tutorialPath.Num() > 0)
 	{
-		
-
 		FVector newLocation = FVector(FMath::VInterpConstantTo(GetActorLocation(), tutorialPath[pathIndex].path->GetActorLocation(), timeSinceTutorialBegan, tutorialPath[pathIndex].interpSpeed));
 		SetActorLocation(newLocation);
 		if (GetActorLocation() == tutorialPath[pathIndex].path->GetActorLocation())
@@ -483,7 +498,8 @@ void APlayer_Base::TutorialMovement()
 			}
 			else
 			{
-				SetTutorialStatus(false);
+				bTutorialImageIsActive = true;
+				ExecuteTutorialImageSpawn();
 			}
 		}
 	}

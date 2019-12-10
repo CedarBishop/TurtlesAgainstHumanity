@@ -90,6 +90,9 @@ public:
 
 	//Functions Section
 
+	UFUNCTION(BlueprintNativeEvent)
+	void ExecuteTutorialImageSpawn();
+
 	UFUNCTION( BlueprintCallable)
 	void ForwardStroke(float force);
 
@@ -174,11 +177,17 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UAudioComponent* backGroundMusicAudioComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAudioComponent* ambientSFXAudioComponent;
 	
 	//
 
 
 	//Variables Section
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial")
+	bool bTutorialImageIsActive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsBraking;
