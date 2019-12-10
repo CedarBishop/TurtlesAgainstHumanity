@@ -33,7 +33,7 @@ void APlayer_Base::BeginPlay()
 	oxygen = maxOxygen;
 	
 	bPlayerIsDead = false;
-
+	bTutorialImageIsActive = false;
 	stressPercentage = stressLevel / maximumStressLevel;
 	oxygenPercentage = oxygen / maxOxygen;
 
@@ -119,7 +119,6 @@ void APlayer_Base::ForwardStroke(float force)
 	{
 		bTutorialImageIsActive = false;
 		ExecuteTutorialImageSpawn();
-		SetTutorialStatus(false);
 	}
 	swimAudioComponent->Play();
 }
@@ -464,44 +463,70 @@ void APlayer_Base::TutorialMovement()
 	timeSinceTutorialBegan += deltaTime;
 	if (tutorialPath.Num() > 0)
 	{
-		FVector newLocation = FVector(FMath::VInterpConstantTo(GetActorLocation(), tutorialPath[pathIndex].path->GetActorLocation(), timeSinceTutorialBegan, tutorialPath[pathIndex].interpSpeed));
-		SetActorLocation(newLocation);
-		if (GetActorLocation() == tutorialPath[pathIndex].path->GetActorLocation())
+		if (tutorialPath[pathIndex].path == NULL)
 		{
-			if (pathIndex < tutorialPath.Num() - 1 )
+			if (pathIndex < tutorialPath.Num() - 1)
 			{
-				if (tutorialPath[pathIndex].bStopsAtTargetPoint)
+				timeSinceTutorialBegan = (timeSinceTutorialBegan / 1.5f);
+				pathIndex++;
+				tutorialStoppingTimer = tutorialPath[pathIndex].stoppingTime;		
+			}
+			else
+			{
+				if (bTutorialImageIsActive == false)
 				{
-					if (tutorialStoppingTimer <= 0)
+					bTutorialImageIsActive = true;
+					SetTutorialStatus(false);
+					ExecuteTutorialImageSpawn();
+				}
+			}
+		}
+		else
+		{
+			FVector newLocation = FVector(FMath::VInterpConstantTo(GetActorLocation(), tutorialPath[pathIndex].path->GetActorLocation(), timeSinceTutorialBegan, tutorialPath[pathIndex].interpSpeed));
+			SetActorLocation(newLocation);
+			if (GetActorLocation() == tutorialPath[pathIndex].path->GetActorLocation())
+			{
+				if (pathIndex < tutorialPath.Num() - 1)
+				{
+					if (tutorialPath[pathIndex].bStopsAtTargetPoint)
 					{
-						timeSinceTutorialBegan = (timeSinceTutorialBegan / 1.2f);
-						pathIndex++;
-						tutorialStoppingTimer = tutorialPath[pathIndex].stoppingTime;
-					
+						if (tutorialStoppingTimer <= 0)
+						{
+							timeSinceTutorialBegan = (timeSinceTutorialBegan / 1.5f);
+							pathIndex++;
+							tutorialStoppingTimer = tutorialPath[pathIndex].stoppingTime;
+
+						}
+						else
+						{
+							tutorialStoppingTimer -= deltaTime;
+
+						}
 					}
 					else
 					{
-						tutorialStoppingTimer -= deltaTime;
-					
+						timeSinceTutorialBegan = (timeSinceTutorialBegan / 1.5f);
+						pathIndex++;
+						tutorialStoppingTimer = tutorialPath[pathIndex].stoppingTime;
+						/*	if (GEngine)
+							{
+								GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Incremented path"));
+							}*/
 					}
 				}
 				else
 				{
-					timeSinceTutorialBegan = 0;
-					pathIndex++;
-					tutorialStoppingTimer = tutorialPath[pathIndex].stoppingTime;
-				/*	if (GEngine)
+					if (bTutorialImageIsActive == false)
 					{
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Incremented path"));
-					}*/
+						bTutorialImageIsActive = true;
+						SetTutorialStatus(false);
+						ExecuteTutorialImageSpawn();
+					}
 				}
 			}
-			else
-			{
-				bTutorialImageIsActive = true;
-				ExecuteTutorialImageSpawn();
-			}
 		}
+		
 	}
 }
 
