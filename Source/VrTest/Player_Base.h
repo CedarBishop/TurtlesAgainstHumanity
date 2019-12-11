@@ -175,8 +175,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UAudioComponent* healAudioComponent;
 
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//class UAudioComponent* backGroundMusicAudioComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAudioComponent* backGroundMusicAudioComponent;
+	class UAudioComponent* levelOneMusicAudioComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UAudioComponent* levelTwoMusicAudioComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UAudioComponent* ambientSFXAudioComponent;

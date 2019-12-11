@@ -300,9 +300,17 @@ void APlayer_Base::InitializeComponents()
 	ambientSFXAudioComponent->SetupAttachment(camera);
 	ambientSFXAudioComponent->SetRelativeLocation(FVector(100, 0, 0));
 
-	backGroundMusicAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Back Ground Music"));
-	backGroundMusicAudioComponent->SetupAttachment(camera);
-	backGroundMusicAudioComponent->SetRelativeLocation(FVector(100, 0, 0));
+	//backGroundMusicAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Back Ground Music"));
+	//backGroundMusicAudioComponent->SetupAttachment(camera);
+	//backGroundMusicAudioComponent->SetRelativeLocation(FVector(100, 0, 0));
+
+	levelTwoMusicAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Level Two Back Ground Music"));
+	levelTwoMusicAudioComponent->SetupAttachment(camera);
+	levelTwoMusicAudioComponent->SetRelativeLocation(FVector(100, 0, 0));
+
+	levelOneMusicAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Level One Back Ground Music"));
+	levelOneMusicAudioComponent->SetupAttachment(camera);
+	levelOneMusicAudioComponent->SetRelativeLocation(FVector(100, 0, 0));
 }
 
 void APlayer_Base::InitializeVariables()
@@ -434,6 +442,10 @@ void APlayer_Base::SetSFXVolume(float newVolume)
 
 void APlayer_Base::SetMusicVolume(float newVolume)
 {
+	if (levelOneMusicAudioComponent == NULL || levelTwoMusicAudioComponent == NULL)
+	{
+		return;
+	}
 	if (newVolume > 1)
 	{
 		newVolume = 1;
@@ -442,8 +454,12 @@ void APlayer_Base::SetMusicVolume(float newVolume)
 	{
 		newVolume = 0;
 	}
-	backGroundMusicAudioComponent->VolumeModulationMin = newVolume;
-	backGroundMusicAudioComponent->VolumeModulationMax = newVolume;
+	//backGroundMusicAudioComponent->VolumeModulationMin = newVolume;
+	//backGroundMusicAudioComponent->VolumeModulationMax = newVolume;
+	levelTwoMusicAudioComponent->VolumeModulationMin = newVolume;
+	levelTwoMusicAudioComponent->VolumeModulationMax = newVolume;
+	levelOneMusicAudioComponent->VolumeModulationMax = newVolume;
+	levelOneMusicAudioComponent->VolumeModulationMin = newVolume;
 }
 
 void APlayer_Base::SetTutorialStatus(bool status)

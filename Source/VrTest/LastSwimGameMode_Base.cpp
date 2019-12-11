@@ -127,10 +127,10 @@ void ALastSwimGameMode_Base::SaveSettings()
 			SaveGameInstance->sfxVolume = gameInstance->sfxVolume;
 			SaveGameInstance->bgmVolume = gameInstance->musicVolume;
 			SaveGameInstance->bHasBeenSaved = true;
-			if (GEngine)
+			/*if (GEngine)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Saved Values"));
-			}
+			}*/
 		}
 
 
@@ -138,10 +138,10 @@ void ALastSwimGameMode_Base::SaveSettings()
 		// Save the data immediately.
 		if (UGameplayStatics::SaveGameToSlot(SaveGameInstance, slotName, userIndex))
 		{
-			if (GEngine)
+			/*if (GEngine)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Saved Game"));
-			}
+			}*/
 			// Save succeeded.
 		}
 	}
@@ -166,10 +166,10 @@ void ALastSwimGameMode_Base::LoadSettings()
 				gameInstance->musicVolume = LoadedGame->bgmVolume;
 				gameInstance->LODLevel = LoadedGame->LODLevel;
 
-				if (GEngine)
+				/*if (GEngine)
 				{
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Loaded Saved Values"));
-				}
+				}*/
 			}
 			else
 			{
@@ -177,10 +177,10 @@ void ALastSwimGameMode_Base::LoadSettings()
 				gameInstance->musicVolume = 1.0f;
 				gameInstance->LODLevel = 1;
 
-				if (GEngine)
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Loaded Default Values"));
-				}
+				//if (GEngine)
+				//{
+				//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Loaded Default Values"));
+				//}
 			}
 			
 			
@@ -201,10 +201,10 @@ void ALastSwimGameMode_Base::LoadSettings()
 	}
 	else
 	{
-		if (GEngine)
+		/*if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Loaded Game Failed"));
-		}
+		}*/
 	}
 }
 
